@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalender Akademik Skyleen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config={theme:{extend:{colors:{pastel:{pink:'#FFF0F2',pinkDark:'#FFB7B2',pinkDeep:'#FF8B94',accent:'#FF7096',purple:'#F3E8FF',purpleDark:'#D8B4FE',blue:'#E0F2FE',green:'#DCFCE7',yellow:'#FEF3C7',text:'#4A3B40'}},fontFamily:{sans:['"Plus Jakarta Sans"','sans-serif'],serif:['"Playfair Display"','serif']}}}}
+  </script>
+  <style>
+    body{background:linear-gradient(135deg,#FFF5F6 0%,#FFF0F2 50%,#F5F3FF 100%);font-family:'Plus Jakarta Sans',sans-serif;color:#4A3B40}
+    .custom-shadow{box-shadow:0 10px 30px -10px rgba(255,139,148,.25)}
+    .card-shadow{box-shadow:0 8px 20px -6px rgba(255,139,148,.15)}
+    .active-tab{background-color:#FF8B94!important;color:white!important;transform:translateY(-4px);box-shadow:0 10px 20px -5px rgba(255,139,148,.4)}
+    .day{min-height:108px}
+    @media(max-width:640px){.day{min-height:84px}.event-pill{font-size:8px}}
+  </style>
+</head>
+<body class="min-h-screen py-6 px-4 sm:px-6 lg:px-8">
+<div class="max-w-6xl mx-auto">
+  <header class="bg-white rounded-3xl p-6 sm:p-8 mb-6 custom-shadow border border-pastel-pink relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-40 h-40 bg-pastel-purple rounded-bl-full opacity-50"></div>
+    <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+      <div class="flex items-center gap-4">
+        <div class="w-16 h-16 bg-pastel-purpleDark rounded-2xl flex items-center justify-center text-3xl shadow-md border-2 border-white">🗓️</div>
+        <div>
+          <span class="inline-block px-3 py-1 text-[10px] font-black tracking-widest text-pastel-accent bg-pastel-pink rounded-full uppercase">Kelas 7A</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-800 mt-2">Kalender Akademik Skyleen</h1>
+          <p class="text-sm text-gray-400 mt-1">Semester Ganjil 2026/2027 • SMP Kristen Calvin</p>
+        </div>
+      </div>
+      <div class="bg-gradient-to-r from-pastel-pink to-pastel-purple px-5 py-4 rounded-2xl border border-white">
+        <p class="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Pengingat</p>
+        <p id="next-event" class="text-sm font-extrabold text-gray-700 mt-1">Memuat kegiatan berikutnya...</p>
+      </div>
+    </div>
+  </header>
+
+  <nav class="grid grid-cols-2 gap-3 mb-6 bg-white p-2 rounded-2xl card-shadow border border-pastel-pink">
+    <a href="index.html" class="rounded-xl px-4 py-3 font-extrabold text-xs sm:text-sm text-center text-gray-500 transition-all hover:bg-pastel-pink">📚 Jadwal Pelajaran</a>
+    <a href="kalender.html" class="active-tab rounded-xl px-4 py-3 font-extrabold text-xs sm:text-sm text-center transition-all">🗓️ Kalender Akademik</a>
+  </nav>
+
+  <main class="bg-white rounded-3xl custom-shadow border border-pastel-pink overflow-hidden">
+    <div class="bg-gradient-to-r from-pastel-purple to-pastel-pink p-5 sm:p-6 flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div>
+        <p class="text-[10px] tracking-[.2em] font-black text-pastel-accent uppercase">My School Planner</p>
+        <h2 id="month-label" class="text-2xl font-extrabold text-gray-800 mt-1"></h2>
+      </div>
+      <div class="flex items-center gap-2 bg-white/80 rounded-xl p-1">
+        <button id="prev" onclick="changeMonth(-1)" class="w-10 h-10 rounded-lg font-black text-pastel-accent hover:bg-white">‹</button>
+        <button onclick="goToday()" class="px-4 h-10 rounded-lg text-xs font-extrabold text-gray-600 hover:bg-white">Bulan Ini</button>
+        <button id="next" onclick="changeMonth(1)" class="w-10 h-10 rounded-lg font-black text-pastel-accent hover:bg-white">›</button>
+      </div>
+    </div>
+
+    <div class="p-4 sm:p-6">
+      <div class="flex flex-wrap gap-2 mb-5 text-[10px] font-bold">
+        <span class="px-3 py-1 rounded-full bg-pastel-purple text-purple-700">● Kegiatan</span>
+        <span class="px-3 py-1 rounded-full bg-pastel-pink text-rose-600">● Penting / Ujian</span>
+        <span class="px-3 py-1 rounded-full bg-pastel-green text-emerald-700">● Libur</span>
+        <span class="px-3 py-1 rounded-full bg-pastel-yellow text-amber-700">● Orang Tua</span>
+      </div>
+      <div class="overflow-x-auto">
+        <div class="min-w-[720px]">
+          <div class="grid grid-cols-7 text-center text-xs font-extrabold text-gray-500 uppercase bg-pastel-pink/60 rounded-t-xl overflow-hidden">
+            <div class="py-3">Sen</div><div class="py-3">Sel</div><div class="py-3">Rab</div><div class="py-3">Kam</div><div class="py-3">Jum</div><div class="py-3 bg-pastel-green/70">Sab</div><div class="py-3 bg-pastel-green/70">Min</div>
+          </div>
+          <div id="calendar-grid" class="grid grid-cols-7 border-l border-t border-pastel-pink"></div>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-5 mt-6">
+        <section class="bg-gradient-to-br from-pastel-purple/60 to-pastel-pink/60 rounded-2xl p-5 border border-white">
+          <label for="focus" class="block text-[10px] font-black tracking-widest text-pastel-accent uppercase">My focus this month</label>
+          <input id="focus" oninput="saveFocus()" placeholder="Tulis target bulan ini..." class="w-full mt-3 bg-white/80 border border-white rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-pastel-pinkDeep">
+          <div class="mt-5 space-y-3">
+            <label class="flex items-center gap-3 text-xs font-semibold text-gray-600"><input type="checkbox" class="w-4 h-4 accent-pink-400"> Cek informasi sekolah</label>
+            <label class="flex items-center gap-3 text-xs font-semibold text-gray-600"><input type="checkbox" class="w-4 h-4 accent-pink-400"> Siapkan perlengkapan</label>
+            <label class="flex items-center gap-3 text-xs font-semibold text-gray-600"><input type="checkbox" class="w-4 h-4 accent-pink-400"> Catat deadline tugas</label>
+          </div>
+        </section>
+        <section class="bg-white rounded-2xl border border-pastel-pink p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-extrabold text-gray-800">Tanggal Penting</h3>
+            <span id="event-count" class="text-[10px] font-bold bg-pastel-pink text-pastel-accent px-2 py-1 rounded-full"></span>
+          </div>
+          <div id="agenda" class="space-y-3"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="text-center mt-10 mb-5">
+    <p class="text-sm font-serif italic text-gray-400">"Be prepared, stay joyful, and do your best every day."</p>
+    <p class="text-[10px] text-gray-400 mt-2">SMP Kristen Calvin © 2026</p>
+  </footer>
+</div>
+
+<script>
+const events=[
+{start:'2026-08-01',end:'2026-08-08',title:'Pansofia, Calvin Cup 2026 & Open House SKC',type:'activity'},
+{start:'2026-08-03',title:'Upacara Bendera',type:'school'},
+{start:'2026-08-05',title:'Ibadah Gabungan',type:'school'},
+{start:'2026-08-08',title:'Open House SKC',type:'activity'},
+{start:'2026-08-17',title:'Upacara Hari Kemerdekaan RI',type:'school'},
+{start:'2026-08-21',title:'Seminar Orang Tua & Guru',type:'parent'},
+{start:'2026-08-25',title:'Libur Maulid Nabi Muhammad',type:'holiday'},
+{start:'2026-09-02',title:'Ibadah Gabungan SMP/A',type:'school'},
+{start:'2026-09-07',title:'Upacara Bendera',type:'school'},
+{start:'2026-09-18',title:'Rapor Tengah Semester & Seminar Orang Tua',type:'important'},
+{start:'2026-09-21',end:'2026-09-23',title:'Kamping Pramuka ke Kebon Jati',type:'activity'},
+{start:'2026-09-24',end:'2026-09-25',title:'Libur Tengah Semester',type:'holiday'},
+{start:'2026-10-05',title:'Upacara Bendera',type:'school'},
+{start:'2026-10-07',title:'Ibadah Gabungan SMP/A',type:'school'},
+{start:'2026-10-16',title:'Seminar Orang Tua & Guru',type:'parent'},
+{start:'2026-10-19',title:'Upacara Bendera',type:'school'},
+{start:'2026-10-28',title:'Peringatan Hari Sumpah Pemuda',type:'school'},
+{start:'2026-10-29',title:'Kunjungan Pendidikan',type:'activity'},
+{start:'2026-11-02',end:'2026-11-27',title:'Periode Tugas Akhir Semester',type:'important'},
+{start:'2026-11-02',title:'Upacara Bendera',type:'school'},
+{start:'2026-11-16',title:'Upacara Bendera',type:'school'},
+{start:'2026-11-20',title:'Seminar Orang Tua & Guru',type:'parent'},
+{start:'2026-11-30',end:'2026-12-01',title:'ASAS Ganjil Tertulis',type:'exam'},
+{start:'2026-12-02',title:'Selebrasi P4',type:'activity'},
+{start:'2026-12-03',end:'2026-12-04',title:'Classmeeting',type:'activity'},
+{start:'2026-12-05',title:'Family Concert di ASJ',type:'activity'},
+{start:'2026-12-07',title:'Christmas Caroling',type:'activity'},
+{start:'2026-12-08',title:'Perayaan Natal SMP',type:'school'},
+{start:'2026-12-09',end:'2026-12-10',title:'Gladi Resik Acara Natal SKC',type:'school'},
+{start:'2026-12-11',title:'Rapor Akhir Semester & Ibadah Natal SKC',type:'important'},
+{start:'2026-12-14',end:'2027-01-08',title:'Libur Akhir Semester Ganjil',type:'holiday'}];
+const names=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const styles={activity:'bg-pastel-purple text-purple-800 border-purple-200',school:'bg-pastel-blue text-sky-800 border-sky-200',parent:'bg-pastel-yellow text-amber-800 border-amber-200',holiday:'bg-pastel-green text-emerald-800 border-emerald-200',important:'bg-pastel-pink text-rose-700 border-rose-200',exam:'bg-pastel-pink text-rose-700 border-rose-200'};
+let month=7;
+function key(y,m,d){return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0')}
+function localDate(v){const p=v.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])}
+function range(e){const a=localDate(e.start),b=localDate(e.end||e.start);if(a.getMonth()===b.getMonth())return a.getDate()===b.getDate()?a.getDate()+' '+names[a.getMonth()]:a.getDate()+'–'+b.getDate()+' '+names[a.getMonth()];return a.getDate()+' '+names[a.getMonth()]+' – '+b.getDate()+' '+names[b.getMonth()]}
+function changeMonth(n){month=Math.max(7,Math.min(11,month+n));render()}
+function goToday(){const now=new Date();month=(now.getFullYear()===2026&&now.getMonth()>=7&&now.getMonth()<=11)?now.getMonth():7;render()}
+function saveFocus(){localStorage.setItem('skyleen-focus-'+month,document.getElementById('focus').value)}
+function render(){
+ document.getElementById('month-label').textContent=names[month]+' 2026';
+ document.getElementById('prev').disabled=month===7;document.getElementById('next').disabled=month===11;
+ document.getElementById('prev').classList.toggle('opacity-30',month===7);document.getElementById('next').classList.toggle('opacity-30',month===11);
+ const first=new Date(2026,month,1),total=new Date(2026,month+1,0).getDate(),offset=(first.getDay()+6)%7,grid=document.getElementById('calendar-grid');grid.innerHTML='';
+ for(let i=0;i<offset;i++){const c=document.createElement('div');c.className='day bg-gray-50 border-r border-b border-pastel-pink';grid.appendChild(c)}
+ for(let day=1;day<=total;day++){const k=key(2026,month,day),dayEvents=events.filter(e=>k>=e.start&&k<=(e.end||e.start)),c=document.createElement('div');c.className='day p-2 border-r border-b border-pastel-pink bg-white';c.innerHTML='<div class="font-extrabold text-xs text-gray-600 mb-1">'+day+'</div>';dayEvents.slice(0,3).forEach(e=>{const p=document.createElement('div');p.className='event-pill border rounded-md px-1.5 py-1 mb-1 text-[10px] leading-tight font-bold '+styles[e.type];p.textContent=e.title;c.appendChild(p)});grid.appendChild(c)}
+ const start=key(2026,month,1),end=key(2026,month,total),list=events.filter(e=>e.start<=end&&(e.end||e.start)>=start);
+ document.getElementById('event-count').textContent=list.length+' agenda';
+ document.getElementById('agenda').innerHTML=list.map(e=>'<div class="flex gap-3 border-t border-pastel-pink pt-3"><span class="mt-1 w-2 h-2 rounded-full bg-pastel-accent flex-none"></span><div><p class="text-[10px] uppercase font-extrabold text-gray-400">'+range(e)+'</p><p class="text-xs font-bold text-gray-700 mt-1">'+e.title+'</p></div></div>').join('');
+ document.getElementById('focus').value=localStorage.getItem('skyleen-focus-'+month)||'';
+}
+function nextEvent(){const today=key(new Date().getFullYear(),new Date().getMonth(),new Date().getDate()),n=events.find(e=>(e.end||e.start)>=today);document.getElementById('next-event').textContent=n?n.title+' • '+range(n):'Semua agenda semester selesai'}
+render();nextEvent();
+</script>
+</body>
+</html>
